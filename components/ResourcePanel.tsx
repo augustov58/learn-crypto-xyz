@@ -13,6 +13,7 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
   const [width, setWidth] = useState(85); // percentage
   const [height, setHeight] = useState(92); // vh
   const [isResizing, setIsResizing] = useState(false);
+  const [leftPosition, setLeftPosition] = useState(7.5); // percentage from left, calculated as (100 - 85) / 2
   const panelRef = useRef<HTMLDivElement>(null);
 
   // Add global styles when resizing
@@ -92,7 +93,7 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 dark:bg-black/85 flex items-center justify-center z-[100] p-4"
+      className="fixed inset-0 bg-black/70 dark:bg-black/85 z-[100]"
       onClick={onClose}
     >
       <div
@@ -104,7 +105,10 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
           width: `${width}vw`,
           maxHeight: `${height}vh`,
           cursor: isResizing ? 'grabbing' : 'default',
-          userSelect: isResizing ? 'none' : 'auto'
+          userSelect: isResizing ? 'none' : 'auto',
+          position: 'fixed',
+          top: '4vh',
+          left: `${leftPosition}vw`
         }}
       >
         <div
