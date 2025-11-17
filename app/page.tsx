@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import MindMap from '@/components/MindMap';
 import FilterPanel from '@/components/FilterPanel';
+import ThemeToggle from '@/components/ThemeToggle';
 import { topics, categories } from '@/data/crypto-topics';
 import { DifficultyLevel } from '@/types';
 
@@ -15,12 +16,17 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+      <header className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold">Learn Crypto</h1>
-          <p className="text-blue-100 mt-1">
-            Interactive learning paths for cryptocurrency and blockchain technology
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold">Learn Crypto</h1>
+              <p className="text-blue-100 dark:text-blue-200 mt-1">
+                Interactive learning paths for cryptocurrency and blockchain technology
+              </p>
+            </div>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -34,7 +40,7 @@ export default function Home() {
       />
 
       {/* Mind Map */}
-      <div className="flex-1 bg-gray-50">
+      <div className="flex-1 bg-gray-50 dark:bg-gray-900">
         <MindMap
           topics={topics}
           categories={categories}
@@ -44,9 +50,9 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-3">
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-3">
         <div className="max-w-7xl mx-auto px-4">
-          <p className="text-sm text-gray-600 text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
             Click on any topic to view curated learning resources •{' '}
             <span className="font-semibold">{topics.length} topics</span> •{' '}
             <span className="font-semibold">
