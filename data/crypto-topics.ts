@@ -666,7 +666,7 @@ export const topics: Topic[] = [
       {
         id: 'res-48',
         title: 'Quilibrium: Complete Technical Guide',
-        url: '/resources/Quilibrium.md',
+        url: '/resources/Quilibrium',
         type: 'documentation',
         difficulty: 'Intermediate',
         description: 'Comprehensive report covering Quilibrium architecture, founder background, MPC technology, tokenomics, and ecosystem',
