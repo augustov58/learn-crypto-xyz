@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Topic } from '@/types';
+import { useDarkMode } from '@/hooks/useDarkMode';
 
 interface ResourcePanelProps {
   topic: Topic;
@@ -11,6 +12,7 @@ interface ResourcePanelProps {
 
 export default function ResourcePanel({ topic, color, onClose }: ResourcePanelProps) {
   const [completedResources, setCompletedResources] = useState<Set<string>>(new Set());
+  const isDarkMode = useDarkMode();
 
   // Load completed resources from localStorage on mount
   useEffect(() => {
@@ -57,8 +59,6 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
     Advanced: 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-red-300 dark:border-red-700',
   };
 
-  // Check if dark mode is active
-  const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
   const bgColor = isDarkMode ? '#0a0a0a' : '#ffffff';
 
   const completedCount = completedResources.size;

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { Handle, Position } from 'reactflow';
 import { Topic } from '@/types';
 import ResourcePanel from './ResourcePanel';
+import { useDarkMode } from '@/hooks/useDarkMode';
 
 interface TopicNodeProps {
   data: {
@@ -16,6 +17,7 @@ interface TopicNodeProps {
 function TopicNode({ data }: TopicNodeProps) {
   const { topic, color } = data;
   const [showResources, setShowResources] = useState(false);
+  const isDarkMode = useDarkMode();
 
   const difficultyColors = {
     Beginner: 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-300 dark:border-green-700',
@@ -23,8 +25,6 @@ function TopicNode({ data }: TopicNodeProps) {
     Advanced: 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-red-300 dark:border-red-700',
   };
 
-  // Check if dark mode is active
-  const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
   const bgColor = isDarkMode ? '#1f2937' : '#ffffff';
 
   return (
