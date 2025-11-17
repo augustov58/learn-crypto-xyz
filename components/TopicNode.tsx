@@ -1,6 +1,7 @@
 'use client';
 
 import React, { memo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Handle, Position } from 'reactflow';
 import { Topic } from '@/types';
 import ResourcePanel from './ResourcePanel';
@@ -53,12 +54,13 @@ function TopicNode({ data }: TopicNodeProps) {
       </div>
       <Handle type="source" position={Position.Bottom} className="w-2 h-2" />
 
-      {showResources && (
+      {showResources && typeof document !== 'undefined' && createPortal(
         <ResourcePanel
           topic={topic}
           color={color}
           onClose={() => setShowResources(false)}
-        />
+        />,
+        document.body
       )}
     </>
   );
