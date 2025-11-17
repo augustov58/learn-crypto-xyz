@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Topic } from '@/types';
+import { useDarkMode } from '@/hooks/useDarkMode';
 
 interface ResourcePanelProps {
   topic: Topic;
@@ -10,6 +11,53 @@ interface ResourcePanelProps {
 }
 
 export default function ResourcePanel({ topic, color, onClose }: ResourcePanelProps) {
+  const [completedResources, setCompletedResources] = useState<Set<string>>(new Set());
+  const isDarkMode = useDarkMode();
+
+  // Load completed resources from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(`completed-${topic.id}`);
+    if (stored) {
+      try {
+        const completed = JSON.parse(stored);
+        setCompletedResources(new Set(completed));
+      } catch (e) {
+        console.error('Error loading completed resources:', e);
+      }
+    }
+  }, [topic.id]);
+
+  // Save to localStorage whenever completedResources changes
+  useEffect(() => {
+    localStorage.setItem(`completed-${topic.id}`, JSON.stringify(Array.from(completedResources)));
+  }, [completedResources, topic.id]);
+
+  const toggleResourceComplete = (resourceId: string) => {
+    setCompletedResources(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(resourceId)) {
+        newSet.delete(resourceId);
+      } else {
+        newSet.add(resourceId);
+      }
+      return newSet;
+    });
+  };
+
+  // Helper function to safely get hostname from URL
+  const getHostname = (url: string): string => {
+    try {
+      // Check if it's a relative URL
+      if (url.startsWith('/')) {
+        return 'Local Resource';
+      }
+      const urlObj = new URL(url);
+      return urlObj.hostname;
+    } catch (e) {
+      return 'Invalid URL';
+    }
+  };
+
   const resourceIcons = {
     article: '📄',
     video: '🎥',
@@ -20,69 +68,117 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
   };
 
   const difficultyColors = {
-    Beginner: 'bg-green-100 text-green-800 border-green-300',
-    Intermediate: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    Advanced: 'bg-red-100 text-red-800 border-red-300',
+    Beginner: 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border-green-300 dark:border-green-700',
+    Intermediate: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 border-yellow-300 dark:border-yellow-700',
+    Advanced: 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-red-300 dark:border-red-700',
   };
+
+  const bgColor = isDarkMode ? '#0a0a0a' : '#ffffff';
+
+  const completedCount = completedResources.size;
+  const totalCount = topic.resources.length;
+  const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
+      className="fixed inset-0 z-[100] overflow-y-auto"
+      style={{ backgroundColor: bgColor }}
     >
+      {/* Header with close button and topic info */}
       <div
-        className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
+        className="sticky top-0 z-10 border-b-4"
+        style={{ borderColor: color, backgroundColor: bgColor }}
       >
-        <div
-          className="sticky top-0 p-6 border-b-4 bg-white z-10"
-          style={{ borderColor: color }}
-        >
+        <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800">{topic.name}</h2>
-              <p className="text-gray-600 mt-2">{topic.description}</p>
-              <div className="mt-3">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100">{topic.name}</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-3 text-lg">{topic.description}</p>
+              <div className="mt-4 flex items-center gap-4">
                 <span
-                  className={`text-sm px-3 py-1 rounded-full border ${
+                  className={`text-sm px-4 py-2 rounded-full border ${
                     difficultyColors[topic.difficulty]
                   }`}
                 >
                   {topic.difficulty}
                 </span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Progress: {completedCount} / {totalCount} completed ({progressPercentage.toFixed(0)}%)
+                </span>
+              </div>
+              {/* Progress bar */}
+              <div className="mt-3 w-full max-w-md bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div
+                  className="h-2 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${progressPercentage}%`,
+                    backgroundColor: color
+                  }}
+                />
               </div>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none"
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-4xl font-bold leading-none ml-6"
+              aria-label="Close"
             >
               ×
             </button>
           </div>
         </div>
+      </div>
 
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Learning Resources ({topic.resources.length})
-          </h3>
-          <div className="space-y-4">
-            {topic.resources.map((resource) => (
-              <a
+      {/* Resources list */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
+          Learning Resources ({totalCount})
+        </h2>
+
+        <div className="space-y-4">
+          {topic.resources.map((resource) => {
+            const isCompleted = completedResources.has(resource.id);
+
+            return (
+              <div
                 key={resource.id}
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 hover:shadow-md transition-all"
+                className={`p-5 border-2 rounded-lg transition-all ${
+                  isCompleted
+                    ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md'
+                }`}
               >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">{resourceIcons[resource.type]}</span>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="font-semibold text-gray-800 hover:underline">
+                <div className="flex items-start gap-4">
+                  {/* Checkbox */}
+                  <div className="flex-shrink-0 pt-1">
+                    <input
+                      type="checkbox"
+                      checked={isCompleted}
+                      onChange={() => toggleResourceComplete(resource.id)}
+                      className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 cursor-pointer"
+                      aria-label={`Mark ${resource.title} as ${isCompleted ? 'incomplete' : 'complete'}`}
+                    />
+                  </div>
+
+                  {/* Icon */}
+                  <span className="text-3xl flex-shrink-0">{resourceIcons[resource.type]}</span>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`font-semibold text-lg hover:underline ${
+                          isCompleted
+                            ? 'text-gray-600 dark:text-gray-400 line-through'
+                            : 'text-gray-800 dark:text-gray-100'
+                        }`}
+                      >
                         {resource.title}
-                      </h4>
+                      </a>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full border whitespace-nowrap ${
+                        className={`text-xs px-3 py-1 rounded-full border whitespace-nowrap ${
                           difficultyColors[resource.difficulty]
                         }`}
                       >
@@ -90,28 +186,28 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
                       </span>
                     </div>
                     {resource.description && (
-                      <p className="text-sm text-gray-600 mt-1">{resource.description}</p>
+                      <p className="text-gray-600 dark:text-gray-400 mt-2">{resource.description}</p>
                     )}
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                    <div className="flex items-center gap-3 mt-3">
+                      <span className="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
                         {resource.type}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {new URL(resource.url).hostname}
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {getHostname(resource.url)}
                       </span>
                     </div>
                   </div>
                 </div>
-              </a>
-            ))}
-          </div>
+              </div>
+            );
+          })}
+        </div>
 
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
-              <strong>💡 Tip:</strong> Click on any resource to open it in a new tab. Work
-              through resources in order for the best learning experience.
-            </p>
-          </div>
+        <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <p className="text-blue-800 dark:text-blue-200">
+            <strong>💡 Tip:</strong> Check off resources as you complete them to track your progress.
+            Click on any resource title to open it in a new tab. Your progress is automatically saved!
+          </p>
         </div>
       </div>
     </div>

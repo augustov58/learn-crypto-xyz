@@ -109,13 +109,18 @@ export default function MindMap({
         maxZoom={1.5}
         defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-        <Controls />
+        <Background
+          variant={BackgroundVariant.Dots}
+          gap={16}
+          size={1}
+          className="bg-gray-50 dark:bg-gray-900"
+        />
+        <Controls className="bg-white dark:bg-gray-800 border dark:border-gray-700" />
         <MiniMap
           nodeColor={(node) => {
             return (node.data as { color: string }).color || '#6B7280';
           }}
-          className="bg-white"
+          className="bg-white dark:bg-gray-800 border dark:border-gray-700"
         />
       </ReactFlow>
     </div>
