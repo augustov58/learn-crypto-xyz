@@ -120,7 +120,11 @@ export default function MindMap({
           nodeColor={(node) => {
             return (node.data as { color: string }).color || '#6B7280';
           }}
-          className="bg-white dark:bg-gray-800 border dark:border-gray-700"
+          className="bg-white dark:bg-gray-800 border dark:border-gray-700 hidden md:block"
+          style={{
+            width: 120,
+            height: 80,
+          }}
         />
       </ReactFlow>
     </div>
