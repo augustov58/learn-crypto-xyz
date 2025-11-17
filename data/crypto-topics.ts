@@ -37,6 +37,18 @@ export const categories: Category[] = [
     description: 'Wallet security and best practices',
     color: '#EC4899', // pink
   },
+  {
+    id: 'privacy',
+    name: 'Privacy & Decentralization',
+    description: 'Privacy-focused cryptocurrencies and decentralized infrastructure',
+    color: '#6366F1', // indigo
+  },
+  {
+    id: 'ai',
+    name: 'AI & Blockchain',
+    description: 'Intersection of artificial intelligence and blockchain technology',
+    color: '#06B6D4', // cyan
+  },
 ];
 
 export const topics: Topic[] = [
@@ -47,7 +59,7 @@ export const topics: Topic[] = [
     description: 'What is cryptocurrency and how does it work',
     category: 'fundamentals',
     difficulty: 'Beginner',
-    position: { x: 250, y: 100 },
+    position: { x: 300, y: 50 },
     subtopics: ['bitcoin-basics', 'wallets'],
     resources: [
       {
@@ -73,7 +85,7 @@ export const topics: Topic[] = [
     description: 'Understanding Bitcoin, the first cryptocurrency',
     category: 'fundamentals',
     difficulty: 'Beginner',
-    position: { x: 100, y: 250 },
+    position: { x: 50, y: 220 },
     subtopics: ['mining', 'blockchain-basics'],
     resources: [
       {
@@ -99,7 +111,7 @@ export const topics: Topic[] = [
     description: 'Storing and managing your cryptocurrency',
     category: 'fundamentals',
     difficulty: 'Beginner',
-    position: { x: 400, y: 250 },
+    position: { x: 550, y: 220 },
     subtopics: ['security-basics'],
     resources: [
       {
@@ -126,7 +138,7 @@ export const topics: Topic[] = [
     description: 'How blockchain technology works',
     category: 'blockchain',
     difficulty: 'Beginner',
-    position: { x: 100, y: 400 },
+    position: { x: 50, y: 420 },
     subtopics: ['consensus', 'smart-contracts'],
     resources: [
       {
@@ -151,7 +163,7 @@ export const topics: Topic[] = [
     description: 'PoW, PoS, and other consensus algorithms',
     category: 'blockchain',
     difficulty: 'Intermediate',
-    position: { x: 250, y: 500 },
+    position: { x: 300, y: 580 },
     subtopics: ['mining'],
     resources: [
       {
@@ -176,7 +188,7 @@ export const topics: Topic[] = [
     description: 'Understanding crypto mining and validators',
     category: 'blockchain',
     difficulty: 'Intermediate',
-    position: { x: 400, y: 500 },
+    position: { x: 50, y: 620 },
     resources: [
       {
         id: 'res-11',
@@ -195,7 +207,7 @@ export const topics: Topic[] = [
     description: 'Self-executing contracts on blockchain',
     category: 'development',
     difficulty: 'Intermediate',
-    position: { x: 650, y: 100 },
+    position: { x: 800, y: 50 },
     subtopics: ['ethereum', 'solidity'],
     resources: [
       {
@@ -220,7 +232,7 @@ export const topics: Topic[] = [
     description: 'The leading smart contract platform',
     category: 'development',
     difficulty: 'Intermediate',
-    position: { x: 800, y: 250 },
+    position: { x: 1050, y: 220 },
     subtopics: ['solidity', 'defi-basics', 'erc20'],
     resources: [
       {
@@ -245,7 +257,7 @@ export const topics: Topic[] = [
     description: 'Writing smart contracts in Solidity',
     category: 'development',
     difficulty: 'Advanced',
-    position: { x: 950, y: 400 },
+    position: { x: 1200, y: 420 },
     subtopics: ['web3-dev'],
     resources: [
       {
@@ -411,7 +423,7 @@ export const topics: Topic[] = [
     description: 'Best practices for securing your crypto',
     category: 'security',
     difficulty: 'Beginner',
-    position: { x: 400, y: 400 },
+    position: { x: 550, y: 420 },
     resources: [
       {
         id: 'res-27',
@@ -428,13 +440,226 @@ export const topics: Topic[] = [
     description: 'Understanding token standards',
     category: 'development',
     difficulty: 'Intermediate',
-    position: { x: 800, y: 400 },
+    position: { x: 900, y: 420 },
     resources: [
       {
         id: 'res-28',
         title: 'ERC-20 Token Standard',
         url: 'https://ethereum.org/en/developers/docs/standards/tokens/erc-20/',
         type: 'documentation',
+        difficulty: 'Intermediate',
+      },
+    ],
+  },
+
+  // Privacy & Decentralization
+  {
+    id: 'privacy-basics',
+    name: 'Privacy in Crypto',
+    description: 'Understanding privacy and anonymity in cryptocurrency',
+    category: 'privacy',
+    difficulty: 'Beginner',
+    position: { x: 1300, y: 50 },
+    subtopics: ['zcash', 'monero'],
+    resources: [
+      {
+        id: 'res-29',
+        title: 'Why Privacy Matters in Crypto',
+        url: 'https://www.coindesk.com/learn/why-privacy-matters-in-cryptocurrency/',
+        type: 'article',
+        difficulty: 'Beginner',
+      },
+      {
+        id: 'res-30',
+        title: 'Privacy Coins Explained',
+        url: 'https://www.youtube.com/watch?v=3Sl3fa_yJ6I',
+        type: 'video',
+        difficulty: 'Beginner',
+      },
+    ],
+  },
+  {
+    id: 'zcash',
+    name: 'Zcash',
+    description: 'Privacy-preserving cryptocurrency using zero-knowledge proofs',
+    category: 'privacy',
+    difficulty: 'Intermediate',
+    position: { x: 1450, y: 220 },
+    resources: [
+      {
+        id: 'res-31',
+        title: 'What is Zcash?',
+        url: 'https://z.cash/learn/',
+        type: 'documentation',
+        difficulty: 'Beginner',
+        description: 'Official Zcash learning resources',
+      },
+      {
+        id: 'res-32',
+        title: 'How Zcash Works',
+        url: 'https://www.youtube.com/watch?v=J1Nr1VL5dGU',
+        type: 'video',
+        difficulty: 'Intermediate',
+      },
+      {
+        id: 'res-33',
+        title: 'Understanding zk-SNARKs',
+        url: 'https://z.cash/technology/zksnarks/',
+        type: 'documentation',
+        difficulty: 'Advanced',
+      },
+    ],
+  },
+  {
+    id: 'monero',
+    name: 'Monero',
+    description: 'Privacy-focused cryptocurrency with ring signatures',
+    category: 'privacy',
+    difficulty: 'Intermediate',
+    position: { x: 1600, y: 220 },
+    resources: [
+      {
+        id: 'res-34',
+        title: 'What is Monero?',
+        url: 'https://www.getmonero.org/get-started/what-is-monero/',
+        type: 'documentation',
+        difficulty: 'Beginner',
+        description: 'Official Monero introduction',
+      },
+      {
+        id: 'res-35',
+        title: 'How Monero Works',
+        url: 'https://www.youtube.com/watch?v=cjbHqvr4ffo',
+        type: 'video',
+        difficulty: 'Intermediate',
+      },
+      {
+        id: 'res-36',
+        title: 'Monero Ring Signatures',
+        url: 'https://www.getmonero.org/resources/moneropedia/ringsignatures.html',
+        type: 'documentation',
+        difficulty: 'Advanced',
+      },
+    ],
+  },
+  {
+    id: 'decentralized-storage',
+    name: 'Decentralized Cloud Storage',
+    description: 'Distributed file storage systems and networks',
+    category: 'privacy',
+    difficulty: 'Intermediate',
+    position: { x: 1450, y: 420 },
+    resources: [
+      {
+        id: 'res-37',
+        title: 'What is Decentralized Storage?',
+        url: 'https://ethereum.org/en/developers/docs/storage/',
+        type: 'documentation',
+        difficulty: 'Beginner',
+      },
+      {
+        id: 'res-38',
+        title: 'IPFS Introduction',
+        url: 'https://docs.ipfs.tech/concepts/what-is-ipfs/',
+        type: 'documentation',
+        difficulty: 'Intermediate',
+      },
+      {
+        id: 'res-39',
+        title: 'Filecoin & Decentralized Storage',
+        url: 'https://www.youtube.com/watch?v=EClPAFPeXIQ',
+        type: 'video',
+        difficulty: 'Intermediate',
+      },
+    ],
+  },
+
+  // AI & Blockchain
+  {
+    id: 'ai-blockchain-basics',
+    name: 'AI & Blockchain Fundamentals',
+    description: 'Introduction to AI and blockchain convergence',
+    category: 'ai',
+    difficulty: 'Beginner',
+    position: { x: 1300, y: 620 },
+    subtopics: ['bittensor'],
+    resources: [
+      {
+        id: 'res-40',
+        title: 'AI and Blockchain: A Perfect Match?',
+        url: 'https://www.ibm.com/blog/ai-and-blockchain/',
+        type: 'article',
+        difficulty: 'Beginner',
+      },
+      {
+        id: 'res-41',
+        title: 'Decentralized AI Explained',
+        url: 'https://www.youtube.com/watch?v=gJW1NSFQKHg',
+        type: 'video',
+        difficulty: 'Beginner',
+      },
+    ],
+  },
+  {
+    id: 'bittensor',
+    name: 'Bittensor',
+    description: 'Decentralized machine learning network',
+    category: 'ai',
+    difficulty: 'Advanced',
+    position: { x: 1450, y: 780 },
+    resources: [
+      {
+        id: 'res-42',
+        title: 'What is Bittensor?',
+        url: 'https://bittensor.com/',
+        type: 'documentation',
+        difficulty: 'Intermediate',
+        description: 'Official Bittensor website and documentation',
+      },
+      {
+        id: 'res-43',
+        title: 'Bittensor Whitepaper',
+        url: 'https://bittensor.com/whitepaper',
+        type: 'documentation',
+        difficulty: 'Advanced',
+      },
+      {
+        id: 'res-44',
+        title: 'Introduction to Bittensor',
+        url: 'https://www.youtube.com/watch?v=nC0ijM6Or-c',
+        type: 'video',
+        difficulty: 'Intermediate',
+      },
+    ],
+  },
+  {
+    id: 'equilibrium',
+    name: 'Equilibrium',
+    description: 'Cross-chain DeFi hub with AI-powered features',
+    category: 'ai',
+    difficulty: 'Intermediate',
+    position: { x: 1600, y: 780 },
+    resources: [
+      {
+        id: 'res-45',
+        title: 'What is Equilibrium?',
+        url: 'https://equilibrium.io/',
+        type: 'documentation',
+        difficulty: 'Beginner',
+        description: 'Official Equilibrium platform overview',
+      },
+      {
+        id: 'res-46',
+        title: 'Equilibrium DeFi Suite',
+        url: 'https://docs.equilibrium.io/',
+        type: 'documentation',
+        difficulty: 'Intermediate',
+      },
+      {
+        id: 'res-47',
+        title: 'Equilibrium Explained',
+        url: 'https://www.youtube.com/watch?v=nVq-qKmQkrI',
+        type: 'video',
         difficulty: 'Intermediate',
       },
     ],
