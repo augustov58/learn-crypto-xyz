@@ -460,7 +460,7 @@ export const topics: Topic[] = [
     category: 'privacy',
     difficulty: 'Beginner',
     position: { x: 1300, y: 50 },
-    subtopics: ['zcash', 'monero'],
+    subtopics: ['zcash', 'monero', 'quilibrium'],
     resources: [
       {
         id: 'res-29',
@@ -549,6 +549,7 @@ export const topics: Topic[] = [
     category: 'privacy',
     difficulty: 'Intermediate',
     position: { x: 1450, y: 420 },
+    subtopics: ['quilibrium'],
     resources: [
       {
         id: 'res-37',
@@ -633,32 +634,32 @@ export const topics: Topic[] = [
     ],
   },
   {
-    id: 'equilibrium',
-    name: 'Equilibrium',
-    description: 'Cross-chain DeFi hub with AI-powered features',
-    category: 'ai',
+    id: 'quilibrium',
+    name: 'Quilibrium',
+    description: 'Decentralized cloud platform with privacy-preserving features',
+    category: 'privacy',
     difficulty: 'Intermediate',
-    position: { x: 1600, y: 780 },
+    position: { x: 1600, y: 420 },
     resources: [
       {
         id: 'res-45',
-        title: 'What is Equilibrium?',
-        url: 'https://equilibrium.io/',
+        title: 'What is Quilibrium?',
+        url: 'https://quilibrium.com/',
         type: 'documentation',
         difficulty: 'Beginner',
-        description: 'Official Equilibrium platform overview',
+        description: 'Official Quilibrium platform overview',
       },
       {
         id: 'res-46',
-        title: 'Equilibrium DeFi Suite',
-        url: 'https://docs.equilibrium.io/',
+        title: 'Quilibrium Documentation',
+        url: 'https://docs.quilibrium.com/',
         type: 'documentation',
         difficulty: 'Intermediate',
       },
       {
         id: 'res-47',
-        title: 'Equilibrium Explained',
-        url: 'https://www.youtube.com/watch?v=nVq-qKmQkrI',
+        title: 'Quilibrium Network Explained',
+        url: 'https://www.youtube.com/watch?v=RLa2h2ux8VY',
         type: 'video',
         difficulty: 'Intermediate',
       },
