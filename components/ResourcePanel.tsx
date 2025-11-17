@@ -44,6 +44,20 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
     });
   };
 
+  // Helper function to safely get hostname from URL
+  const getHostname = (url: string): string => {
+    try {
+      // Check if it's a relative URL
+      if (url.startsWith('/')) {
+        return 'Local Resource';
+      }
+      const urlObj = new URL(url);
+      return urlObj.hostname;
+    } catch (e) {
+      return 'Invalid URL';
+    }
+  };
+
   const resourceIcons = {
     article: '📄',
     video: '🎥',
@@ -179,7 +193,7 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
                         {resource.type}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {new URL(resource.url).hostname}
+                        {getHostname(resource.url)}
                       </span>
                     </div>
                   </div>
