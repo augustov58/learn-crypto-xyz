@@ -663,6 +663,14 @@ export const topics: Topic[] = [
         type: 'video',
         difficulty: 'Intermediate',
       },
+      {
+        id: 'res-48',
+        title: 'Quilibrium: Complete Technical Guide',
+        url: '/resources/Quilibrium.md',
+        type: 'documentation',
+        difficulty: 'Intermediate',
+        description: 'Comprehensive report covering Quilibrium architecture, founder background, MPC technology, tokenomics, and ecosystem',
+      },
     ],
   },
 ];
