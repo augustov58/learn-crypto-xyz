@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Topic } from '@/types';
 
 interface ResourcePanelProps {
@@ -10,26 +10,37 @@ interface ResourcePanelProps {
 }
 
 export default function ResourcePanel({ topic, color, onClose }: ResourcePanelProps) {
-  const [width, setWidth] = useState(85); // percentage
-  const [height, setHeight] = useState(92); // vh
-  const [isResizing, setIsResizing] = useState(false);
-  const [leftPosition, setLeftPosition] = useState(7.5); // percentage from left, calculated as (100 - 85) / 2
-  const panelRef = useRef<HTMLDivElement>(null);
+  const [completedResources, setCompletedResources] = useState<Set<string>>(new Set());
 
-  // Add global styles when resizing
-  React.useEffect(() => {
-    if (isResizing) {
-      document.body.style.userSelect = 'none';
-      document.body.style.cursor = 'grabbing';
-    } else {
-      document.body.style.userSelect = '';
-      document.body.style.cursor = '';
+  // Load completed resources from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(`completed-${topic.id}`);
+    if (stored) {
+      try {
+        const completed = JSON.parse(stored);
+        setCompletedResources(new Set(completed));
+      } catch (e) {
+        console.error('Error loading completed resources:', e);
+      }
     }
-    return () => {
-      document.body.style.userSelect = '';
-      document.body.style.cursor = '';
-    };
-  }, [isResizing]);
+  }, [topic.id]);
+
+  // Save to localStorage whenever completedResources changes
+  useEffect(() => {
+    localStorage.setItem(`completed-${topic.id}`, JSON.stringify(Array.from(completedResources)));
+  }, [completedResources, topic.id]);
+
+  const toggleResourceComplete = (resourceId: string) => {
+    setCompletedResources(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(resourceId)) {
+        newSet.delete(resourceId);
+      } else {
+        newSet.add(resourceId);
+      }
+      return newSet;
+    });
+  };
 
   const resourceIcons = {
     article: '📄',
@@ -48,118 +59,112 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
 
   // Check if dark mode is active
   const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-  const panelBgColor = isDarkMode ? '#1f2937' : '#ffffff';
+  const bgColor = isDarkMode ? '#0a0a0a' : '#ffffff';
 
-  const handleResizeStart = useCallback((e: React.MouseEvent, direction: 'right' | 'bottom' | 'corner') => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsResizing(true);
-
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startWidth = width;
-    const startHeight = height;
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      moveEvent.preventDefault();
-
-      if (direction === 'right' || direction === 'corner') {
-        const deltaX = moveEvent.clientX - startX;
-        const viewportWidth = window.innerWidth;
-        const widthChange = (deltaX / viewportWidth) * 100;
-        const newWidth = Math.min(95, Math.max(40, startWidth + widthChange));
-        setWidth(newWidth);
-      }
-
-      if (direction === 'bottom' || direction === 'corner') {
-        const deltaY = moveEvent.clientY - startY;
-        const viewportHeight = window.innerHeight;
-        const heightChange = (deltaY / viewportHeight) * 100;
-        const newHeight = Math.min(95, Math.max(50, startHeight + heightChange));
-        setHeight(newHeight);
-      }
-    };
-
-    const handleMouseUp = (upEvent: MouseEvent) => {
-      upEvent.preventDefault();
-      setIsResizing(false);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  }, [width, height]);
+  const completedCount = completedResources.size;
+  const totalCount = topic.resources.length;
+  const progressPercentage = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 dark:bg-black/85 z-[100]"
-      onClick={onClose}
+      className="fixed inset-0 z-[100] overflow-y-auto"
+      style={{ backgroundColor: bgColor }}
     >
+      {/* Header with close button and topic info */}
       <div
-        ref={panelRef}
-        className="rounded-lg shadow-2xl overflow-y-auto relative"
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          backgroundColor: panelBgColor,
-          width: `${width}vw`,
-          maxHeight: `${height}vh`,
-          cursor: isResizing ? 'grabbing' : 'default',
-          userSelect: isResizing ? 'none' : 'auto',
-          position: 'fixed',
-          top: '4vh',
-          left: `${leftPosition}vw`
-        }}
+        className="sticky top-0 z-10 border-b-4"
+        style={{ borderColor: color, backgroundColor: bgColor }}
       >
-        <div
-          className="sticky top-0 p-6 border-b-4 z-10"
-          style={{ borderColor: color, backgroundColor: panelBgColor }}
-        >
+        <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{topic.name}</h2>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">{topic.description}</p>
-              <div className="mt-3">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100">{topic.name}</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-3 text-lg">{topic.description}</p>
+              <div className="mt-4 flex items-center gap-4">
                 <span
-                  className={`text-sm px-3 py-1 rounded-full border ${
+                  className={`text-sm px-4 py-2 rounded-full border ${
                     difficultyColors[topic.difficulty]
                   }`}
                 >
                   {topic.difficulty}
                 </span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Progress: {completedCount} / {totalCount} completed ({progressPercentage.toFixed(0)}%)
+                </span>
+              </div>
+              {/* Progress bar */}
+              <div className="mt-3 w-full max-w-md bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div
+                  className="h-2 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${progressPercentage}%`,
+                    backgroundColor: color
+                  }}
+                />
               </div>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold leading-none"
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-4xl font-bold leading-none ml-6"
+              aria-label="Close"
             >
               ×
             </button>
           </div>
         </div>
+      </div>
 
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-            Learning Resources ({topic.resources.length})
-          </h3>
-          <div className="space-y-4">
-            {topic.resources.map((resource) => (
-              <a
+      {/* Resources list */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
+          Learning Resources ({totalCount})
+        </h2>
+
+        <div className="space-y-4">
+          {topic.resources.map((resource) => {
+            const isCompleted = completedResources.has(resource.id);
+
+            return (
+              <div
                 key={resource.id}
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md transition-all"
+                className={`p-5 border-2 rounded-lg transition-all ${
+                  isCompleted
+                    ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700'
+                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-md'
+                }`}
               >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">{resourceIcons[resource.type]}</span>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-100 hover:underline">
+                <div className="flex items-start gap-4">
+                  {/* Checkbox */}
+                  <div className="flex-shrink-0 pt-1">
+                    <input
+                      type="checkbox"
+                      checked={isCompleted}
+                      onChange={() => toggleResourceComplete(resource.id)}
+                      className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 cursor-pointer"
+                      aria-label={`Mark ${resource.title} as ${isCompleted ? 'incomplete' : 'complete'}`}
+                    />
+                  </div>
+
+                  {/* Icon */}
+                  <span className="text-3xl flex-shrink-0">{resourceIcons[resource.type]}</span>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <a
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`font-semibold text-lg hover:underline ${
+                          isCompleted
+                            ? 'text-gray-600 dark:text-gray-400 line-through'
+                            : 'text-gray-800 dark:text-gray-100'
+                        }`}
+                      >
                         {resource.title}
-                      </h4>
+                      </a>
                       <span
-                        className={`text-xs px-2 py-1 rounded-full border whitespace-nowrap ${
+                        className={`text-xs px-3 py-1 rounded-full border whitespace-nowrap ${
                           difficultyColors[resource.difficulty]
                         }`}
                       >
@@ -167,10 +172,10 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
                       </span>
                     </div>
                     {resource.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{resource.description}</p>
+                      <p className="text-gray-600 dark:text-gray-400 mt-2">{resource.description}</p>
                     )}
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
+                    <div className="flex items-center gap-3 mt-3">
+                      <span className="text-xs px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
                         {resource.type}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -179,56 +184,16 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
                     </div>
                   </div>
                 </div>
-              </a>
-            ))}
-          </div>
-
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
-              <strong>💡 Tip:</strong> Click on any resource to open it in a new tab. Work
-              through resources in order for the best learning experience.
-            </p>
-          </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Resize handles */}
-        {/* Right edge resize handle */}
-        <div
-          className="absolute top-0 right-0 w-4 h-full cursor-ew-resize hover:bg-blue-500/40 active:bg-blue-500/60 transition-colors"
-          onMouseDown={(e) => handleResizeStart(e, 'right')}
-          style={{
-            zIndex: 40,
-            touchAction: 'none'
-          }}
-          title="Drag to resize width"
-        />
-
-        {/* Bottom edge resize handle */}
-        <div
-          className="absolute bottom-0 left-0 w-full h-4 cursor-ns-resize hover:bg-blue-500/40 active:bg-blue-500/60 transition-colors"
-          onMouseDown={(e) => handleResizeStart(e, 'bottom')}
-          style={{
-            zIndex: 40,
-            touchAction: 'none'
-          }}
-          title="Drag to resize height"
-        />
-
-        {/* Bottom-right corner resize handle */}
-        <div
-          className="absolute bottom-0 right-0 w-8 h-8 cursor-nwse-resize hover:bg-blue-500/60 active:bg-blue-500/80 transition-colors rounded-tl-lg"
-          onMouseDown={(e) => handleResizeStart(e, 'corner')}
-          style={{
-            zIndex: 50,
-            touchAction: 'none'
-          }}
-          title="Drag to resize both"
-        >
-          <div className="absolute bottom-1 right-1 flex flex-col gap-0.5">
-            <div className="w-4 h-0.5 bg-gray-400 dark:bg-gray-500" />
-            <div className="w-3 h-0.5 bg-gray-400 dark:bg-gray-500 ml-auto" />
-            <div className="w-2 h-0.5 bg-gray-400 dark:bg-gray-500 ml-auto" />
-          </div>
+        <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <p className="text-blue-800 dark:text-blue-200">
+            <strong>💡 Tip:</strong> Check off resources as you complete them to track your progress.
+            Click on any resource title to open it in a new tab. Your progress is automatically saved!
+          </p>
         </div>
       </div>
     </div>
