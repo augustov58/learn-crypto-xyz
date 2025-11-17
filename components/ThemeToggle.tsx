@@ -3,46 +3,40 @@
 import { useEffect, useState } from 'react';
 
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Get theme from localStorage or system preference
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
 
-    if (savedTheme) {
-      setTheme(savedTheme);
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      setTheme('light');
-      document.documentElement.classList.remove('dark');
-    }
+    // Check current theme
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+
+    setIsDark(shouldBeDark);
+    updateTheme(shouldBeDark);
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-
-    if (newTheme === 'dark') {
+  const updateTheme = (dark: boolean) => {
+    if (dark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
   };
 
+  const toggleTheme = () => {
+    const newTheme = !isDark;
+    setIsDark(newTheme);
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+    updateTheme(newTheme);
+  };
+
   // Prevent hydration mismatch
   if (!mounted) {
     return (
-      <button className="p-2 rounded-lg bg-gray-200 w-10 h-10" />
+      <button className="p-2 rounded-lg bg-gray-200 w-10 h-10" aria-label="Loading theme toggle" />
     );
   }
 
@@ -51,9 +45,10 @@ export default function ThemeToggle() {
       onClick={toggleTheme}
       className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
       aria-label="Toggle theme"
-      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+      title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
     >
-      {theme === 'light' ? (
+      {!isDark ? (
+        // Moon icon - show in light mode
         <svg
           className="w-6 h-6 text-gray-800"
           fill="none"
@@ -68,6 +63,7 @@ export default function ThemeToggle() {
           />
         </svg>
       ) : (
+        // Sun icon - show in dark mode
         <svg
           className="w-6 h-6 text-yellow-300"
           fill="none"
