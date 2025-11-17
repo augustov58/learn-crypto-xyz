@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Topic } from '@/types';
 
 interface ResourcePanelProps {
@@ -10,6 +10,11 @@ interface ResourcePanelProps {
 }
 
 export default function ResourcePanel({ topic, color, onClose }: ResourcePanelProps) {
+  const [width, setWidth] = useState(85); // percentage
+  const [height, setHeight] = useState(92); // vh
+  const [isResizing, setIsResizing] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
   const resourceIcons = {
     article: '📄',
     video: '🎥',
@@ -29,15 +34,59 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
   const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
   const panelBgColor = isDarkMode ? '#1f2937' : '#ffffff';
 
+  const handleResizeStart = useCallback((e: React.MouseEvent, direction: 'right' | 'bottom' | 'corner') => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizing(true);
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startWidth = width;
+    const startHeight = height;
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (direction === 'right' || direction === 'corner') {
+        const deltaX = moveEvent.clientX - startX;
+        const viewportWidth = window.innerWidth;
+        const widthChange = (deltaX / viewportWidth) * 100;
+        const newWidth = Math.min(95, Math.max(40, startWidth + widthChange));
+        setWidth(newWidth);
+      }
+
+      if (direction === 'bottom' || direction === 'corner') {
+        const deltaY = moveEvent.clientY - startY;
+        const viewportHeight = window.innerHeight;
+        const heightChange = (deltaY / viewportHeight) * 100;
+        const newHeight = Math.min(95, Math.max(50, startHeight + heightChange));
+        setHeight(newHeight);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [width, height]);
+
   return (
     <div
       className="fixed inset-0 bg-black/70 dark:bg-black/85 flex items-center justify-center z-[100] p-4"
       onClick={onClose}
     >
       <div
-        className="rounded-lg shadow-2xl w-full max-w-[95vw] lg:max-w-[85vw] max-h-[92vh] overflow-y-auto"
+        ref={panelRef}
+        className="rounded-lg shadow-2xl overflow-y-auto relative"
         onClick={(e) => e.stopPropagation()}
-        style={{ backgroundColor: panelBgColor }}
+        style={{
+          backgroundColor: panelBgColor,
+          width: `${width}vw`,
+          maxHeight: `${height}vh`,
+          cursor: isResizing ? 'grabbing' : 'default'
+        }}
       >
         <div
           className="sticky top-0 p-6 border-b-4 z-10"
@@ -117,6 +166,30 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
               through resources in order for the best learning experience.
             </p>
           </div>
+        </div>
+
+        {/* Resize handles */}
+        {/* Right edge resize handle */}
+        <div
+          className="absolute top-0 right-0 w-2 h-full cursor-ew-resize hover:bg-blue-500/30 transition-colors"
+          onMouseDown={(e) => handleResizeStart(e, 'right')}
+          style={{ zIndex: 20 }}
+        />
+
+        {/* Bottom edge resize handle */}
+        <div
+          className="absolute bottom-0 left-0 w-full h-2 cursor-ns-resize hover:bg-blue-500/30 transition-colors"
+          onMouseDown={(e) => handleResizeStart(e, 'bottom')}
+          style={{ zIndex: 20 }}
+        />
+
+        {/* Bottom-right corner resize handle */}
+        <div
+          className="absolute bottom-0 right-0 w-6 h-6 cursor-nwse-resize hover:bg-blue-500/50 transition-colors rounded-bl-lg"
+          onMouseDown={(e) => handleResizeStart(e, 'corner')}
+          style={{ zIndex: 30 }}
+        >
+          <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-gray-400 dark:border-gray-500" />
         </div>
       </div>
     </div>
