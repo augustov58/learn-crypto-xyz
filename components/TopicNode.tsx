@@ -22,12 +22,16 @@ function TopicNode({ data }: TopicNodeProps) {
     Advanced: 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-red-300 dark:border-red-700',
   };
 
+  // Check if dark mode is active
+  const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const bgColor = isDarkMode ? '#1f2937' : '#ffffff';
+
   return (
     <>
       <Handle type="target" position={Position.Top} className="w-2 h-2" />
       <div
-        className="px-4 py-3 rounded-lg border-2 shadow-lg bg-white dark:bg-gray-800 hover:shadow-xl transition-shadow cursor-pointer min-w-[200px]"
-        style={{ borderColor: color }}
+        className="px-4 py-3 rounded-lg border-2 shadow-lg hover:shadow-xl transition-shadow cursor-pointer min-w-[200px]"
+        style={{ borderColor: color, backgroundColor: bgColor }}
         onClick={() => setShowResources(true)}
       >
         <div className="flex flex-col gap-2">

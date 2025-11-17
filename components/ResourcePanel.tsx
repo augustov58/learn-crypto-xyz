@@ -25,18 +25,23 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
     Advanced: 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 border-red-300 dark:border-red-700',
   };
 
+  // Check if dark mode is active
+  const isDarkMode = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+  const panelBgColor = isDarkMode ? '#1f2937' : '#ffffff';
+
   return (
     <div
-      className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black/70 dark:bg-black/85 flex items-center justify-center z-[100] p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
+        className="rounded-lg shadow-2xl w-full max-w-[95vw] lg:max-w-[85vw] max-h-[92vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
+        style={{ backgroundColor: panelBgColor }}
       >
         <div
-          className="sticky top-0 p-6 border-b-4 bg-white dark:bg-gray-800 z-10"
-          style={{ borderColor: color }}
+          className="sticky top-0 p-6 border-b-4 z-10"
+          style={{ borderColor: color, backgroundColor: panelBgColor }}
         >
           <div className="flex justify-between items-start">
             <div>
