@@ -15,6 +15,21 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
   const [isResizing, setIsResizing] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // Add global styles when resizing
+  React.useEffect(() => {
+    if (isResizing) {
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'grabbing';
+    } else {
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    }
+    return () => {
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+    };
+  }, [isResizing]);
+
   const resourceIcons = {
     article: '📄',
     video: '🎥',
@@ -45,6 +60,8 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
     const startHeight = height;
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
+      moveEvent.preventDefault();
+
       if (direction === 'right' || direction === 'corner') {
         const deltaX = moveEvent.clientX - startX;
         const viewportWidth = window.innerWidth;
@@ -62,7 +79,8 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
       }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (upEvent: MouseEvent) => {
+      upEvent.preventDefault();
       setIsResizing(false);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -85,7 +103,8 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
           backgroundColor: panelBgColor,
           width: `${width}vw`,
           maxHeight: `${height}vh`,
-          cursor: isResizing ? 'grabbing' : 'default'
+          cursor: isResizing ? 'grabbing' : 'default',
+          userSelect: isResizing ? 'none' : 'auto'
         }}
       >
         <div
@@ -171,25 +190,41 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
         {/* Resize handles */}
         {/* Right edge resize handle */}
         <div
-          className="absolute top-0 right-0 w-2 h-full cursor-ew-resize hover:bg-blue-500/30 transition-colors"
+          className="absolute top-0 right-0 w-4 h-full cursor-ew-resize hover:bg-blue-500/40 active:bg-blue-500/60 transition-colors"
           onMouseDown={(e) => handleResizeStart(e, 'right')}
-          style={{ zIndex: 20 }}
+          style={{
+            zIndex: 40,
+            touchAction: 'none'
+          }}
+          title="Drag to resize width"
         />
 
         {/* Bottom edge resize handle */}
         <div
-          className="absolute bottom-0 left-0 w-full h-2 cursor-ns-resize hover:bg-blue-500/30 transition-colors"
+          className="absolute bottom-0 left-0 w-full h-4 cursor-ns-resize hover:bg-blue-500/40 active:bg-blue-500/60 transition-colors"
           onMouseDown={(e) => handleResizeStart(e, 'bottom')}
-          style={{ zIndex: 20 }}
+          style={{
+            zIndex: 40,
+            touchAction: 'none'
+          }}
+          title="Drag to resize height"
         />
 
         {/* Bottom-right corner resize handle */}
         <div
-          className="absolute bottom-0 right-0 w-6 h-6 cursor-nwse-resize hover:bg-blue-500/50 transition-colors rounded-bl-lg"
+          className="absolute bottom-0 right-0 w-8 h-8 cursor-nwse-resize hover:bg-blue-500/60 active:bg-blue-500/80 transition-colors rounded-tl-lg"
           onMouseDown={(e) => handleResizeStart(e, 'corner')}
-          style={{ zIndex: 30 }}
+          style={{
+            zIndex: 50,
+            touchAction: 'none'
+          }}
+          title="Drag to resize both"
         >
-          <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-gray-400 dark:border-gray-500" />
+          <div className="absolute bottom-1 right-1 flex flex-col gap-0.5">
+            <div className="w-4 h-0.5 bg-gray-400 dark:bg-gray-500" />
+            <div className="w-3 h-0.5 bg-gray-400 dark:bg-gray-500 ml-auto" />
+            <div className="w-2 h-0.5 bg-gray-400 dark:bg-gray-500 ml-auto" />
+          </div>
         </div>
       </div>
     </div>
