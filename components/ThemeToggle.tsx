@@ -13,10 +13,17 @@ export default function ThemeToggle() {
 
     if (savedTheme) {
       setTheme(savedTheme);
-      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setTheme('dark');
       document.documentElement.classList.add('dark');
+    } else {
+      setTheme('light');
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 
@@ -24,13 +31,18 @@ export default function ThemeToggle() {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
-    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   };
 
   // Prevent hydration mismatch
   if (!mounted) {
     return (
-      <button className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 w-10 h-10" />
+      <button className="p-2 rounded-lg bg-gray-200 w-10 h-10" />
     );
   }
 

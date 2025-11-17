@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-@theme {
-  --color-*: initial;
-  --dark-mode: class;
-}
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -13,13 +8,6 @@
 :root.dark {
   --background: #0a0a0a;
   --foreground: #ededed;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
