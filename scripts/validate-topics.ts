@@ -38,8 +38,8 @@ function main() {
     if (!validation.success) {
       console.error('❌ Validation failed!\n');
       console.error('Errors:');
-      if (validation.error?.errors) {
-        validation.error.errors.forEach((err) => {
+      if (validation.error?.issues) {
+        validation.error.issues.forEach((err) => {
           const path = err.path.length > 0 ? err.path.join('.') : 'root';
           console.error(`  - ${path}: ${err.message}`);
         });

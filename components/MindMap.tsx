@@ -87,7 +87,7 @@ export default function MindMap({
       // Search query matching
       let searchMatch = true;
       if (query) {
-        searchMatch =
+        searchMatch = Boolean(
           topic.name.toLowerCase().includes(query) ||
           topic.description.toLowerCase().includes(query) ||
           topic.resources.some(
@@ -96,7 +96,8 @@ export default function MindMap({
               r.description?.toLowerCase().includes(query) ||
               r.tags?.some((tag) => tag.toLowerCase().includes(query))
           ) ||
-          categories.find((c) => c.id === topic.category)?.name.toLowerCase().includes(query);
+          categories.find((c) => c.id === topic.category)?.name.toLowerCase().includes(query)
+        );
       }
       
       return difficultyMatch && categoryMatch && searchMatch;

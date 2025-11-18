@@ -1,11 +1,48 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useThemeContext } from './ThemeProvider';
 
 export default function ThemeToggle() {
   const { theme, toggleTheme } = useThemeContext();
+  const [mounted, setMounted] = useState(false);
 
-  const isDark = theme === 'dark';
+  // Prevent hydration mismatch by only rendering after mount
+  useEffect(() => {
+    // This setState is necessary to prevent hydration mismatch
+    // We render a placeholder during SSR, then update after mount
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Mount flag for hydration safety
+    setMounted(true);
+  }, []);
+
+  // Use data-theme attribute as fallback to match what the inline script sets
+  const isDark = mounted ? theme === 'dark' : false;
+
+  // Render a placeholder during SSR to match initial client render
+  if (!mounted) {
+    return (
+      <button
+        className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+        aria-label="Toggle theme"
+        title="Toggle theme"
+        disabled
+      >
+        <svg
+          className="w-6 h-6 text-gray-800"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+          />
+        </svg>
+      </button>
+    );
+  }
 
   return (
     <button

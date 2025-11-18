@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Topic } from '@/types';
 import { useDarkMode } from '@/hooks/useDarkMode';
+import { useProgress } from '@/hooks/useProgress';
 
 interface ResourcePanelProps {
   topic: Topic;
@@ -10,39 +11,10 @@ interface ResourcePanelProps {
   onClose: () => void;
 }
 
-const loadCompletedResources = (topicId: string) => {
-  if (typeof window === 'undefined') {
-    return new Set<string>();
-  }
-
-  const stored = window.localStorage.getItem(`completed-${topicId}`);
-  if (!stored) {
-    return new Set<string>();
-  }
-
-  try {
-    const parsed = JSON.parse(stored) as string[];
-    return new Set(parsed);
-  } catch (error) {
-    console.error('Error loading completed resources:', error);
-    return new Set<string>();
-  }
-};
-
 export default function ResourcePanel({ topic, color, onClose }: ResourcePanelProps) {
-  const [completedResources, setCompletedResources] = useState<Set<string>>(
-    () => loadCompletedResources(topic.id)
-  );
+  const { completedResources, toggleResource, syncing } = useProgress(topic.id);
   const isDarkMode = useDarkMode();
   const panelRef = useRef<HTMLDivElement>(null);
-
-  // Save to localStorage whenever completedResources changes
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    window.localStorage.setItem(`completed-${topic.id}`, JSON.stringify(Array.from(completedResources)));
-  }, [completedResources, topic.id]);
 
   // Manage focus trapping + escape key
   useEffect(() => {
@@ -67,17 +39,6 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
     };
   }, [onClose]);
 
-  const toggleResourceComplete = (resourceId: string) => {
-    setCompletedResources(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(resourceId)) {
-        newSet.delete(resourceId);
-      } else {
-        newSet.add(resourceId);
-      }
-      return newSet;
-    });
-  };
 
   // Helper function to safely get hostname from URL
   const getHostname = (url: string): string => {
@@ -163,6 +124,11 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
                     aria-live="polite"
                   >
                     Progress: {completedCount} / {totalCount} completed ({progressPercentage.toFixed(0)}%)
+                    {syncing && (
+                      <span className="ml-2 text-xs text-blue-600 dark:text-blue-400">
+                        Syncing...
+                      </span>
+                    )}
                   </span>
                 </div>
                 {/* Progress bar */}
@@ -212,8 +178,9 @@ export default function ResourcePanel({ topic, color, onClose }: ResourcePanelPr
                       <input
                         type="checkbox"
                         checked={isCompleted}
-                        onChange={() => toggleResourceComplete(resource.id)}
-                        className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 cursor-pointer"
+                        onChange={() => toggleResource(resource.id)}
+                        disabled={syncing}
+                        className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 cursor-pointer disabled:opacity-50"
                         aria-label={`Mark ${resource.title} as ${isCompleted ? 'incomplete' : 'complete'}`}
                       />
                     </div>

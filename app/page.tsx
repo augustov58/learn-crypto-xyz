@@ -5,16 +5,21 @@ import MindMap from '@/components/MindMap';
 import FilterPanel from '@/components/FilterPanel';
 import ThemeToggle from '@/components/ThemeToggle';
 import SearchCommand from '@/components/SearchCommand';
+import AuthModal from '@/components/auth/AuthModal';
+import UserMenu from '@/components/auth/UserMenu';
+import { useAuth } from '@/hooks/useAuth';
 import { topics, categories } from '@/data/crypto-topics';
 import { DifficultyLevel } from '@/types';
 
 export default function Home() {
+  const { user } = useAuth();
   const [selectedDifficulty, setSelectedDifficulty] = useState<
     DifficultyLevel | 'All'
   >('All');
   const [selectedCategory, setSelectedCategory] = useState<string | 'All'>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [highlightedTopicId, setHighlightedTopicId] = useState<string | undefined>();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const handleTopicSelect = useCallback((topicId: string) => {
     setHighlightedTopicId(topicId);
@@ -55,6 +60,16 @@ export default function Home() {
                 onFilterChange={handleSearchFilterChange}
               />
               <ThemeToggle />
+              {user ? (
+                <UserMenu />
+              ) : (
+                <button
+                  onClick={() => setAuthModalOpen(true)}
+                  className="px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
+                >
+                  Sign In
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -93,6 +108,12 @@ export default function Home() {
           </p>
         </div>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </div>
   );
 }
