@@ -7,6 +7,7 @@ export interface Resource {
   type: 'article' | 'video' | 'course' | 'documentation' | 'tutorial' | 'book';
   difficulty: DifficultyLevel;
   description?: string;
+  tags?: string[]; // Optional tags for filtering and search
 }
 
 export interface Topic {

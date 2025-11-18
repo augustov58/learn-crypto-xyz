@@ -11,11 +11,12 @@ interface TopicNodeProps {
   data: {
     topic: Topic;
     color: string;
+    highlighted?: boolean;
   };
 }
 
 function TopicNode({ data }: TopicNodeProps) {
-  const { topic, color } = data;
+  const { topic, color, highlighted } = data;
   const [showResources, setShowResources] = useState(false);
   const isDarkMode = useDarkMode();
 
@@ -31,8 +32,10 @@ function TopicNode({ data }: TopicNodeProps) {
     <>
       <Handle type="target" position={Position.Top} className="w-2 h-2" />
       <div
-        className="px-4 py-3 rounded-lg border-2 shadow-lg hover:shadow-xl transition-shadow cursor-pointer min-w-[200px]"
-        style={{ borderColor: color, backgroundColor: bgColor }}
+        className={`px-4 py-3 rounded-lg border-2 shadow-lg hover:shadow-xl transition-all cursor-pointer min-w-[200px] ${
+          highlighted ? 'ring-4 ring-blue-400 ring-opacity-50 scale-105' : ''
+        }`}
+        style={{ borderColor: highlighted ? '#3B82F6' : color, backgroundColor: bgColor }}
         onClick={() => setShowResources(true)}
       >
         <div className="flex flex-col gap-2">
@@ -54,14 +57,17 @@ function TopicNode({ data }: TopicNodeProps) {
       </div>
       <Handle type="source" position={Position.Bottom} className="w-2 h-2" />
 
-      {showResources && typeof document !== 'undefined' && createPortal(
-        <ResourcePanel
-          topic={topic}
-          color={color}
-          onClose={() => setShowResources(false)}
-        />,
-        document.body
-      )}
+      {showResources &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <ResourcePanel
+            key={topic.id}
+            topic={topic}
+            color={color}
+            onClose={() => setShowResources(false)}
+          />,
+          document.body
+        )}
     </>
   );
 }

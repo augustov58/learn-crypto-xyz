@@ -13,16 +13,28 @@ export default function MarkdownViewer({ content }: MarkdownViewerProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header with back button */}
+      {/* Header with breadcrumbs */}
       <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="max-w-4xl mx-auto px-6 py-4">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
-          >
-            <span className="text-xl">←</span>
-            Back to Topics
-          </button>
+          <nav className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400" aria-label="Breadcrumb">
+            <button
+              onClick={() => router.push('/')}
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              Home
+            </button>
+            <span aria-hidden="true">/</span>
+            <button
+              onClick={() => router.push('/')}
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              Resources
+            </button>
+            <span aria-hidden="true">/</span>
+            <span className="text-gray-900 dark:text-gray-100 font-medium" aria-current="page">
+              {content.match(/^#\s+(.*)$/m)?.[1]?.trim() || 'Resource'}
+            </span>
+          </nav>
         </div>
       </div>
 

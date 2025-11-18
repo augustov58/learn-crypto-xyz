@@ -1,41 +1,61 @@
 import { notFound } from 'next/navigation';
-import fs from 'fs';
+import type { Metadata } from 'next';
 import path from 'path';
+import { cache } from 'react';
+import { promises as fs } from 'fs';
 import MarkdownViewer from '@/components/MarkdownViewer';
 
-interface PageProps {
-  params: Promise<{ slug: string }>;
-}
+const resourcesDir = path.join(process.cwd(), 'public', 'resources');
 
-export default async function ResourcePage({ params }: PageProps) {
-  const { slug } = await params;
-  const filePath = path.join(process.cwd(), 'public', 'resources', `${slug}.md`);
+type PageProps = {
+  params: { slug: string };
+};
 
-  // Check if file exists
-  if (!fs.existsSync(filePath)) {
+const getResourceContent = cache(async (slug: string) => {
+  const filePath = path.join(resourcesDir, `${slug}.md`);
+
+  try {
+    await fs.access(filePath);
+  } catch {
     notFound();
   }
 
-  // Read the markdown content
-  const content = fs.readFileSync(filePath, 'utf-8');
+  const content = await fs.readFile(filePath, 'utf-8');
+  const headingMatch = content.match(/^#\s+(.*)$/m);
+  const title = headingMatch?.[1]?.trim() ?? slug.replace(/-/g, ' ');
 
-  return <MarkdownViewer content={content} />;
-}
+  return {
+    content,
+    title,
+    description: `In-depth resource for ${title}`,
+  };
+});
 
-// Generate static params for known markdown files
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
-  const resourcesDir = path.join(process.cwd(), 'public', 'resources');
-
   try {
-    const files = fs.readdirSync(resourcesDir);
-    const markdownFiles = files
-      .filter(file => file.endsWith('.md') && file !== 'README.md')
-      .map(file => ({
+    const files = await fs.readdir(resourcesDir);
+    return files
+      .filter((file) => file.endsWith('.md') && file !== 'README.md')
+      .map((file) => ({
         slug: file.replace('.md', ''),
       }));
-
-    return markdownFiles;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const resource = await getResourceContent(params.slug);
+  return {
+    title: `${resource.title} – Learn Crypto`,
+    description: resource.description,
+  };
+}
+
+export default async function ResourcePage({ params }: PageProps) {
+  const resource = await getResourceContent(params.slug);
+  return <MarkdownViewer content={resource.content} />;
+}
+

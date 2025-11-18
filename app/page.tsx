@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import MindMap from '@/components/MindMap';
 import FilterPanel from '@/components/FilterPanel';
 import ThemeToggle from '@/components/ThemeToggle';
+import SearchCommand from '@/components/SearchCommand';
 import { topics, categories } from '@/data/crypto-topics';
 import { DifficultyLevel } from '@/types';
 
@@ -12,20 +13,49 @@ export default function Home() {
     DifficultyLevel | 'All'
   >('All');
   const [selectedCategory, setSelectedCategory] = useState<string | 'All'>('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [highlightedTopicId, setHighlightedTopicId] = useState<string | undefined>();
+
+  const handleTopicSelect = useCallback((topicId: string) => {
+    setHighlightedTopicId(topicId);
+    // Find the topic node and scroll to it (handled by ReactFlow fitView)
+    setTimeout(() => setHighlightedTopicId(undefined), 2000);
+  }, []);
+
+  const handleSearchFilterChange = useCallback(
+    (filters: { searchQuery: string; category: string; difficulty: DifficultyLevel | 'All' }) => {
+      setSearchQuery(filters.searchQuery);
+      if (filters.category !== 'All') {
+        setSelectedCategory(filters.category);
+      }
+      if (filters.difficulty !== 'All') {
+        setSelectedDifficulty(filters.difficulty);
+      }
+    },
+    []
+  );
 
   return (
     <div className="flex flex-col h-screen">
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-800 dark:to-purple-800 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <div>
+          <div className="flex justify-between items-center gap-4">
+            <div className="flex-1">
               <h1 className="text-3xl font-bold">Learn Crypto</h1>
               <p className="text-blue-100 dark:text-blue-200 mt-1">
                 Interactive learning paths for cryptocurrency and blockchain technology
               </p>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              <SearchCommand
+                topics={topics}
+                categories={categories}
+                onTopicSelect={handleTopicSelect}
+                onFilterChange={handleSearchFilterChange}
+              />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
@@ -46,6 +76,8 @@ export default function Home() {
           categories={categories}
           selectedDifficulty={selectedDifficulty}
           selectedCategory={selectedCategory}
+          searchQuery={searchQuery}
+          highlightedTopicId={highlightedTopicId}
         />
       </div>
 
